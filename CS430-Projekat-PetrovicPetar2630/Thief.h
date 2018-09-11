@@ -32,10 +32,14 @@ private:
 	
 	list<Citizen*> m_listOfCitizens;
 
-	
 
 public:
 	
+	float citizenMoneyBeforeAttack;
+
+	list<Citizen*> m_listOfAttackedCitizens;
+	list<float> m_listOfAttackedCitizensMoney;
+
 	bool isOnSamePlaceAsCitizen;
 
 	bool isCaught;

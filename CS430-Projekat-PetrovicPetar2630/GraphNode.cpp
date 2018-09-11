@@ -78,12 +78,27 @@ void GraphNode::render() const {
 		}
 
 
-	}else if(m_terrainFlag == terrainType::jail)
+	}
+	else if(m_terrainFlag == terrainType::jail)
 	{
 
 		glColor3d(0, 0, 0);
 
 		for(int i = -halfSize; i <= halfSize; i = i + halfSize / 4)
+		{
+			glBegin(GL_LINES);
+				glVertex2d(i, -halfSize );
+				glVertex2d(i, halfSize);
+			glEnd();
+		}
+
+	}
+	else if(m_terrainFlag == terrainType::police_station)
+	{
+
+		glColor3d(0, 0, 0);
+
+		for(int i = -halfSize; i <= halfSize; i = i + halfSize)
 		{
 			glBegin(GL_LINES);
 				glVertex2d(i, -halfSize );

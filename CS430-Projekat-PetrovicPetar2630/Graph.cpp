@@ -22,6 +22,10 @@ GraphNode* Graph::getJailEntrence() const{
 	return jailEntrence;
 }
 
+GraphNode* Graph::getPoliceEntrence() const{
+	return policeEntrence;
+}
+
 void Graph::addEdge(const GraphEdge &edge) {
 
     list<GraphEdge> fromList = m_edges[edge.getFrom()];

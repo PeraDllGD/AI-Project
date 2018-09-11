@@ -29,9 +29,13 @@ private:
 
 	AStar* m_path;
 
-public:
+	
 
+public:
+	bool noMoneyLeft;
 	float money;
+
+	float m_moneyToReturn;
 
 	void reset();
 
@@ -49,6 +53,16 @@ public:
 	StateMachine<Citizen>*  GetFSM()const{return m_pStateMachine;}
 
 	Graph* m_graph;
+
+	void MoneyToReturn(float moneyToReturn)
+	{
+		m_moneyToReturn = moneyToReturn;
+	}
+
+	void IncreaseMoneyToReturn(float moneyToReturn)
+	{
+		m_moneyToReturn += moneyToReturn;
+	}
 
 	void setPath(AStar* path)
 	{
@@ -104,6 +118,58 @@ private:
 public:
 
   static CitizenWonder* Instance();
+  
+public:
+  
+  virtual void Enter(Citizen* citizen);
+
+  virtual void Execute(Citizen* citizen);
+
+  virtual void Exit(Citizen* citizen);
+
+};
+
+////////////////////////////////////////////////////////////// 
+
+class CitizenNoMoney : public State<Citizen>
+{
+private:
+  
+  CitizenNoMoney(){}
+  
+  //copy ctor and assignment should be private
+  CitizenNoMoney(const CitizenNoMoney&);
+  CitizenNoMoney& operator=(const CitizenNoMoney&);
+ 
+public:
+
+  static CitizenNoMoney* Instance();
+  
+public:
+  
+  virtual void Enter(Citizen* citizen);
+
+  virtual void Execute(Citizen* citizen);
+
+  virtual void Exit(Citizen* citizen);
+
+};
+
+////////////////////////////////////////////////////////////// 
+
+class CitizenGoToPoliceStation : public State<Citizen>
+{
+private:
+  
+  CitizenGoToPoliceStation(){}
+  
+  //copy ctor and assignment should be private
+  CitizenGoToPoliceStation(const CitizenGoToPoliceStation&);
+  CitizenGoToPoliceStation& operator=(const CitizenGoToPoliceStation&);
+ 
+public:
+
+  static CitizenGoToPoliceStation* Instance();
   
 public:
   

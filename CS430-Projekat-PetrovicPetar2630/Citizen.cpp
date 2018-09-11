@@ -5,6 +5,8 @@
 
 void Citizen::reset()
 {
+	noMoneyLeft = false;
+
 	movementSpeed = 10;
 
 	static int count = 0;
@@ -14,7 +16,7 @@ void Citizen::reset()
 	name << "Citizen " << count;
 	count++;
 
-	cout << name << endl;
+	// cout << name << endl;
 
 	money = rand() % 2000 + 1000.f;
 
@@ -31,6 +33,8 @@ Citizen::Citizen(int id, Graph* graph, float radius): GameObject(entityTypes::ag
 
 		m_pStateMachine = new StateMachine<Citizen>(this);
 
+		
+
 		reset();
 	}
 
@@ -42,7 +46,15 @@ void Citizen::draw(float radius)
 	glPushMatrix();
 
 	glTranslated(m_pos.x, m_pos.y, 0);
-	glColor3f(.4, 1., .4);
+
+	if(noMoneyLeft)
+	{
+		glColor3f(.8, 1., .4);
+	}
+	else
+	{
+		glColor3f(.4, 1., .4);
+	}
 
 	glBegin(GL_POLYGON);
 
@@ -101,8 +113,8 @@ void Citizen::draw(float radius)
 	   glPopMatrix();
 
 	   m_path->render(.5, .7, .2);
-   }*/
-
+   }
+   */
    glPushMatrix();
    drawText(name.str().data(), m_pos.x + m_radius, m_pos.y, Color(0.f, 0.f, 0.f));
 
@@ -133,7 +145,7 @@ CitizenWonder* CitizenWonder::Instance()
 
 void CitizenWonder::Enter(Citizen* citizen)
 {
-
+	citizen->noMoneyLeft = false;
 	GraphNode * start =	citizen->m_graph->getNodeByPosition(citizen->getPos());
 	GraphNode * end =	citizen->m_graph->getRandomNode();
 
@@ -148,10 +160,6 @@ void CitizenWonder::Enter(Citizen* citizen)
 
 void CitizenWonder::Execute(Citizen* citizen)
 {  
-  // printf("CitizenWonder::Execute");
-
-	// citizen->move();
-
 	if(citizen->isFinishedMovement)
 	{
 		citizen->GetFSM()->SetCurrentState(CitizenWonder::Instance());
@@ -159,15 +167,87 @@ void CitizenWonder::Execute(Citizen* citizen)
 
 	if(citizen->money <= 0)
 	{
-		citizen->reset();
+		citizen->GetFSM()->SetCurrentState(CitizenNoMoney::Instance());
 	}
-
 }
 
 
 void CitizenWonder::Exit(Citizen* citizen)
 {
-  // printf("CitizenWonder::Exit");
+}
+
+//-----------------------------------------------------------------------------
+
+CitizenNoMoney* CitizenNoMoney::Instance()
+{
+  static CitizenNoMoney instance;
+
+  return &instance;
+}
+
+void CitizenNoMoney::Enter(Citizen* citizen)
+{
+	citizen->noMoneyLeft = true;
+	GraphNode * start =	citizen->m_graph->getNodeByPosition(citizen->getPos());
+	GraphNode * end =	citizen->m_graph->getRandomNode();
+
+	citizen->setPos(start->getPos()) ;
+
+	AStar* astar = AStar::shortestPath(citizen->m_graph, start, end);
+	citizen->setPath(astar);
+
+	citizen->movementSpeed = 5;
 }
 
 
+void CitizenNoMoney::Execute(Citizen* citizen)
+{  
+	if(citizen->isFinishedMovement)
+	{
+		citizen->GetFSM()->SetCurrentState(CitizenWonder::Instance());
+	}
+}
+
+
+void CitizenNoMoney::Exit(Citizen* citizen)
+{
+}
+
+//-----------------------------------------------------------------------------
+
+CitizenGoToPoliceStation* CitizenGoToPoliceStation::Instance()
+{
+  static CitizenGoToPoliceStation instance;
+
+  return &instance;
+}
+
+void CitizenGoToPoliceStation::Enter(Citizen* citizen)
+{
+
+	GraphNode * start =	citizen->m_graph->getNodeByPosition(citizen->getPos());
+	GraphNode * end =	citizen->m_graph->getPoliceEntrence();
+
+	citizen->setPos(start->getPos()) ;
+
+	AStar* astar = AStar::shortestPath(citizen->m_graph, start, end);
+	citizen->setPath(astar);
+
+	citizen->movementSpeed = 8;
+}
+
+
+void CitizenGoToPoliceStation::Execute(Citizen* citizen)
+{  
+	if(citizen->isFinishedMovement)
+	{
+		citizen->GetFSM()->SetCurrentState(CitizenWonder::Instance());
+	}
+}
+
+
+void CitizenGoToPoliceStation::Exit(Citizen* citizen)
+{
+	citizen->money += citizen->m_moneyToReturn;
+
+}

@@ -159,6 +159,29 @@ Grid::Grid(int collumn, int row, int cellSize) : GameObject(entityTypes::terrain
 
 	graph->setJailEntrence(map[row / 2][collumn / 2 + 2]);
 
+	// add police station
+	for (int i = 0; i < 5; i++) 
+	{
+		map[i][collumn - 1]->setTerain(GraphNode::terrainType::police_station);
+	}
+
+	map[0][collumn - 2]->setTerain(GraphNode::terrainType::police_station);
+	map[1][collumn - 2]->setTerain(GraphNode::terrainType::police_station);
+	map[3][collumn - 2]->setTerain(GraphNode::terrainType::police_station);
+	map[4][collumn - 2]->setTerain(GraphNode::terrainType::police_station);
+
+	map[0][collumn - 3]->setTerain(GraphNode::terrainType::police_station);
+	map[4][collumn - 3]->setTerain(GraphNode::terrainType::police_station);
+
+	// add road to station
+
+	for (int i = 1; i < 6; i++) 
+	{
+		map[2][collumn - 1 - i]->setTerain(GraphNode::terrainType::road);
+	}
+	
+	graph->setPoliceStation(map[2][collumn - 2]);
+
 	// map[row / 2][collumn / 2 + 2]
 
 	graph->setNodes(nodes);
@@ -226,7 +249,6 @@ Grid::Grid(int collumn, int row, int cellSize) : GameObject(entityTypes::terrain
             }
         }
     }
-
 
 	for (auto i = 0; i < row; i++) {
 		delete[] map[i];

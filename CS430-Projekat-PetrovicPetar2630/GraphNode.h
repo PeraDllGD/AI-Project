@@ -18,7 +18,8 @@ public:
 	enum terrainType {
 		road,
 		building,
-		jail
+		jail,
+		police_station
     };
 
     GraphNode() : GameObject(entityTypes::tile, Vector2D<double>(), 0),
@@ -69,6 +70,9 @@ private:
 				break;
 			case jail:
 				m_color = Color(.8, .8, .8);
+				break;
+			case police_station:
+				m_color = Color(.5, .5, .8);
 				break;
 		}
 	}

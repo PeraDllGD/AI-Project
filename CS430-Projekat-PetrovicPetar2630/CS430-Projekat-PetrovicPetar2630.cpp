@@ -23,7 +23,7 @@ int rowNumber = 35;
 
 int numberOfCitizens = 10;	// 10
 int numberOfThieves = 5;    // 5
-int numberOfPolice = 3 ;	// 3
+int numberOfPolice = 5 ;	// 3
 
 list<Citizen*> listOfCitizens;
 list<Thief*> listOfThieves;

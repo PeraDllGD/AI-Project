@@ -21,7 +21,7 @@ void Thief::reset()
 	name << "Thief " << count;
 	count++;
 
-	cout << name << endl;
+	// cout << name << endl;
 
 	isOnSamePlaceAsCitizen = false;
 
@@ -168,7 +168,7 @@ void ThiefWonder::Enter(Thief* citizen)
 {
   //if the miner is not already located at the goldmine, he must
   //change location to the gold mine
-	std::cout << "ThiefWonder: " << citizen->name.str() << endl;
+	// std::cout << "ThiefWonder: " << citizen->name.str() << endl;
 
 	GraphNode * start =	citizen->m_graph->getNodeByPosition(citizen->getPos());
 	GraphNode * end =	citizen->m_graph->getRandomNode();
@@ -230,7 +230,7 @@ void ThiefSeekCitizen::Enter(Thief* citizen)
 
 	if(citizen->isFinishedMovement)
 	{
-		std::cout << "ThiefSeekCitizen: " << citizen->name.str() << endl;
+		// std::cout << "ThiefSeekCitizen: " << citizen->name.str() << endl;
 	
 		GraphNode * start =	citizen->m_graph->getNodeByPosition(citizen->getPos());
 		GraphNode * end =	citizen->m_graph->getRandomNode();
@@ -255,7 +255,7 @@ void ThiefSeekCitizen::Execute(Thief* citizen)
    
 	for (std::list<Citizen*>::iterator it= citizen->getListOfCitizens().begin(); it != citizen->getListOfCitizens().end(); ++it)
 	{
-		if((*it)->getPos().distanceTo(citizen->getPos()) < 50)
+		if((*it)->getPos().distanceTo(citizen->getPos()) < 50 && (*it)->money > 0)
 		{
 			// cout << (*it)->name << endl;
 			citizen->current_enemy = *it;
@@ -298,7 +298,7 @@ void ThiefRunTowardsCitizen::Enter(Thief* citizen)
 
   //if the miner is not already located at the goldmine, he must
   //change location to the gold mine
-	std::cout << "ThiefRunTowardsCitizen: " << citizen->name.str() << endl;
+	// std::cout << "ThiefRunTowardsCitizen: " << citizen->name.str() << endl;
 
 	GraphNode * start =	citizen->m_graph->getNodeByPosition(citizen->getPos());
 	GraphNode * end =	citizen->m_graph->getNodeByPosition(citizen->current_enemy->getPos());
@@ -307,6 +307,8 @@ void ThiefRunTowardsCitizen::Enter(Thief* citizen)
 	citizen->setPath(astar);
 
 	citizen->movementSpeed = 8;
+
+	citizen->citizenMoneyBeforeAttack = citizen->current_enemy->money;
 }
 
 
@@ -337,6 +339,9 @@ void ThiefRunTowardsCitizen::Execute(Thief* citizen)
 		}
 		else if(citizen->current_enemy->money <= 0)
 		{
+			citizen->current_enemy->money = 0;
+			citizen->m_listOfAttackedCitizens.push_back(citizen->current_enemy);
+			citizen->m_listOfAttackedCitizensMoney.push_back(citizen->citizenMoneyBeforeAttack);
 			citizen->GetFSM()->SetCurrentState(ThiefSeekCitizen::Instance());
 		}
 	}
@@ -374,6 +379,8 @@ ThiefFollowPolicemanToJail* ThiefFollowPolicemanToJail::Instance()
 
 void ThiefFollowPolicemanToJail::Enter(Thief* citizen)
 {
+	citizen->m_listOfAttackedCitizens.push_back(citizen->current_enemy);
+	citizen->m_listOfAttackedCitizensMoney.push_back(citizen->citizenMoneyBeforeAttack - citizen->current_enemy->money);
 }
 
 
@@ -385,5 +392,33 @@ void ThiefFollowPolicemanToJail::Execute(Thief* citizen)
 
 void ThiefFollowPolicemanToJail::Exit(Thief* citizen)
 {
-  // printf("CitizenWonder::Exit");
+	cout << "ThiefFollowPolicemanToJail " << citizen->m_listOfAttackedCitizens.size() << " " << citizen->m_listOfAttackedCitizensMoney.size() <<  endl;
+
+	cout << "Thief -> " << citizen->name.str() << endl;
+
+	for (std::list<Citizen*>::iterator it= citizen->m_listOfAttackedCitizens.begin(); it != citizen->m_listOfAttackedCitizens.end(); ++it)
+	{
+		
+		float money = citizen->m_listOfAttackedCitizensMoney.front();
+		citizen->m_listOfAttackedCitizensMoney.pop_front();
+
+		if(money > 10)
+		{
+			cout << "Citizen -> " << (*it)->name.str() << "\tCurrent money -> " << (*it)->money << "\tmoney to return -> " << money << endl;
+
+			if((*it)->GetFSM()->CurrentState() == CitizenGoToPoliceStation::Instance())
+			{
+				(*it)->IncreaseMoneyToReturn(money);
+			}
+			else
+			{
+				(*it)->MoneyToReturn(money);
+				(*it)->GetFSM()->SetCurrentState(CitizenGoToPoliceStation::Instance());
+			}
+			
+		}
+	}
+
+	citizen->m_listOfAttackedCitizens.clear();
+
 }

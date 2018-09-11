@@ -23,6 +23,8 @@ private:
 
 	GraphNode* jailEntrence;
 
+	GraphNode* policeEntrence;
+
 public:
 
 	Graph(int collumn, int row, int cellSize) : GameObject(entityTypes::graph, Vector2D<double>(-1, -1), 0),
@@ -44,6 +46,13 @@ public:
 	{
 		jailEntrence = node;
 	}
+
+	GraphNode* getPoliceEntrence() const;
+	void setPoliceStation(GraphNode* node)
+	{
+		policeEntrence = node;
+	}
+	
 
 	vector<GraphNode*> getNodes() const { return m_nodes; }
 

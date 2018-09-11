@@ -22,7 +22,7 @@ Police::Police(int id, Graph* graph, float radius): GameObject(entityTypes::agen
 		name << "Policeman " << count;
 		count++;
 
-		cout << name << endl;
+		// cout << name << endl;
 		
 		setPos(m_graph->getRandomNode()->getPos());
 
@@ -257,6 +257,7 @@ void PoliceChase::Execute(Police* citizen)
 
 void PoliceChase::Exit(Police* citizen)
 {
+	
 }
 
 
@@ -301,5 +302,6 @@ void PoliceExecuteToJail::Execute(Police* citizen)
 
 void PoliceExecuteToJail::Exit(Police* citizen)
 {
+
 }
 
